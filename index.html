@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Маша, для тебя ✨</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fff0f5, #ffe4e1, #ffd1dc);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(255, 182, 193, 0.4);
+            text-align: center;
+            max-width: 380px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+        }
+        .emoji {
+            font-size: 65px;
+            margin-bottom: 15px;
+            animation: bounce 2.5s infinite ease-in-out;
+        }
+        h1 {
+            color: #ff69b4;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #8b7b8b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        button {
+            background: linear-gradient(90deg, #ff69b4, #ff85a1);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+            transition: all 0.2s;
+            position: relative;
+            z-index: 999;
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        .hidden {
+            display: none;
+        }
+        #secretMessage {
+            margin-top: 25px;
+            font-size: 17px;
+            color: #4a3b4e;
+            line-height: 1.6;
+            animation: fadeIn 1.2s ease forwards;
+        }
+        .quiz-container {
+            margin-top: 25px;
+            text-align: left;
+            animation: fadeIn 1s ease forwards;
+        }
+        .quiz-question {
+            font-size: 16px;
+            color: #4a3b4e;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            min-height: 40px;
+        }
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quiz-btn {
+            background: #fff;
+            color: #4a3b4e;
+            border: 2px solid #ffe4e1;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: none;
+            font-weight: normal;
+            transition: all 0.2s;
+        }
+        .quiz-btn:active {
+            transform: scale(0.98);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="emoji">💝</div>
+        <h1>Маша, прекрасного дня! ✨</h1>
+        <p class="subtitle">Саша приготовил для тебя небольшой интерактивный сюрприз</p>
+        
+        <button id="giftBtn" onclick="startQuiz()">Начать викторину</button>
+        
+        <!-- Блок викторины -->
+        <div id="quizBlock" class="quiz-container hidden">
+            <div id="questionText" class="quiz-question"></div>
+            <div id="optionsBlock" class="quiz-options"></div>
+        </div>
+
+        <p id="secretMessage" class="hidden">Ура, ты прошла викторину! Маша, ты невероятная, особенная и самая замечательная! Пусть этот день принесет тебе много улыбок, тепла и отличного настроения. С любовью, Саша! 🌸✨</p>
+    </div>
+
+    <script>
+        // База вопросов викторины
+        const quizData = [
+            {
+                question: "Кто самый главный фанат твоей улыбки? 😊",
+                answers: ["Брэд Питт", "Саша 🙋‍♂️", "Один секретный агент"],
+                correct: 1
+            },
+            {
+                question: "Какое кодовое слово должен сказать Саша, чтобы поднять тебе настроение?",
+                answers: ["«Куплю шоколадку» 🍫", "«Пойдем гулять»", "«Ты самая лучшая» 💖"],
+                correct: 2
+            },
+            {
+                question: "Что происходит, когда Саша видит Машу? 👀",
+                answers: ["Его пульс улетает в космос 🚀", "Он забывает все слова", "Все варианты верны!"],
+                correct: 2
+            }
+        ];
+
+        let currentQuestion = 0;
+
+        function startQuiz() {
+            document.getElementById("giftBtn").style.display = "none";
+            document.getElementById("quizBlock").classList.remove("hidden");
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const qBlock = document.getElementById("questionText");
+            const oBlock = document.getElementById("optionsBlock");
+            
+            // Очищаем прошлые варианты
+            oBlock.innerHTML = "";
+            
+            // Ставим текущий вопрос
+            const currentData = quizData[currentQuestion];
+            qBlock.innerText = currentData.question;
+            
+            // Генерируем кнопки ответов
+            currentData.answers.forEach((answer, index) => {
+                const btn = document.createElement("button");
+                btn.className = "quiz-btn";
+                btn.innerText = answer;
+                btn.onclick = function() { checkAnswer(index, btn); };
+                oBlock.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, clickedBtn) {
+            const currentData = quizData[currentQuestion];
+            
+            if (selectedIndex === currentData.correct) {
+                currentQuestion++;
+                if (currentQuestion < quizData.length) {
+                    showQuestion();
+                } else {
+                    // Конец викторины
+                    document.getElementById("quizBlock").style.display = "none";
+                    document.getElementById("secretMessage").classList.remove("hidden");
+                    createHearts();
+                }
+            } else {
+                // Если ответ неверный
+                clickedBtn.style.background = '#ffe4e1';
+                clickedBtn.style.borderColor = '#ff69b4';
+                clickedBtn.innerText = 'Попробуй другой вариант! 😉';
+            }
+        }
+
+        function createHearts() {
+            const romanticSymbols = ['❤️', '💖', '🌸', '✨', '💕', '🌹'];
+            for (let i = 0; i < 45; i++) {
+                const heart = document.createElement('div');
+                heart.innerText = romanticSymbols[Math.floor(Math.random() * romanticSymbols.length)];
+                heart.style.position = 'fixed';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = '-5vh';
+                heart.style.fontSize = Math.random() * 25 + 15 + 'px';
+                heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+                heart.style.pointerEvents = 'none';
+                
+                const duration = Math.random() * 2 + 2.5;
+                heart.style.transition = `transform ${duration}s linear, top ${duration}s linear`;
+                
+                document.body.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.style.top = '105vh';
+                    heart.style.transform = `rotate(${Math.random() * 720}deg)`;
+                }, 50);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+        }
+    </script>
+</body>
+</html>
